@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Time Tracking Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: #f3f4f6;
+            margin: 0;
+            padding: 0;
+            color: #111827;
+        }
+
+        .container {
+            max-width: 960px;
+            margin: 24px auto;
+            padding: 24px;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(15, 23, 42, 0.1);
+        }
+
+        h1 {
+            margin-top: 0;
+            font-size: 1.6rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        h2 {
+            font-size: 1.1rem;
+            margin-top: 1.5rem;
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 0.25rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .card {
+            border-radius: 10px;
+            border: 1px solid #e5e7eb;
+            padding: 16px;
+            background: #f9fafb;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 4px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #4b5563;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 8px 10px;
+            border-radius: 8px;
+            border: 1px solid #d1d5db;
+            font-size: 0.9rem;
+            box-sizing: border-box;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 1px #2563eb33;
+        }
+
+        button {
+            border: none;
+            border-radius: 999px;
+            padding: 8px 16px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            background: #2563eb;
+            color: #ffffff;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        button.secondary {
+            background: #6b7280;
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: default;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 0.7rem;
+            background: #e5e7eb;
+            color: #374151;
+        }
+
+        .status {
+            margin-top: 8px;
+            font-size: 0.85rem;
+        }
+
+        .status.ok {
+            color: #065f46;
+        }
+
+        .status.error {
+            color: #b91c1c;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 8px;
+            font-size: 0.85rem;
+        }
+
+        th, td {
+            border-bottom: 1px solid #e5e7eb;
+            padding: 6px 8px;
+            text-align: left;
+        }
+
+        th {
+            background: #f3f4f6;
+            font-weight: 600;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>
+        <span>Internal Time Tracking</span>
+        <span class="header-actions">
+          <span id="currentUser" class="badge hidden"></span>
+          <button id="logoutBtn" class="secondary hidden" type="button">Logout</button>
+        </span>
+    </h1>
+
+    <div id="authSection">
+        <h2>Sign in</h2>
+        <div class="grid">
+            <div class="card">
+                <form id="loginForm">
+                    <label for="loginUsername">Username</label>
+                    <input id="loginUsername" name="username" required>
+
+                    <label for="loginPassword" style="margin-top: 8px;">Password</label>
+                    <input id="loginPassword" name="password" type="password" required>
+
+                    <div style="margin-top: 12px;">
+                        <button type="submit">Login</button>
+                    </div>
+                </form>
+                <div id="loginStatus" class="status"></div>
+            </div>
+
+            <div class="card">
+                <h3 style="margin-top:0;font-size:1rem;">First time here? Register</h3>
+                <form id="registerForm">
+                    <label for="regFullName">Full name</label>
+                    <input id="regFullName" name="fullName" required>
+
+                    <label for="regUsername" style="margin-top: 8px;">Username</label>
+                    <input id="regUsername" name="username" required>
+
+                    <label for="regPassword" style="margin-top: 8px;">Password</label>
+                    <input id="regPassword" name="password" type="password" required>
+
+                    <div style="margin-top: 12px;">
+                        <button type="submit">Register &amp; Login</button>
+                    </div>
+                </form>
+                <div id="registerStatus" class="status"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="appSection" class="hidden">
+        <h2>My dashboard</h2>
+
+        <div class="grid">
+            <div class="card">
+                <h3 style="margin-top:0;font-size:1rem;">Attendance</h3>
+                <div>
+                    <button id="checkInBtn" type="button">Check in</button>
+                    <button id="checkOutBtn" class="secondary" type="button" style="margin-left:4px;">Check out</button>
+                </div>
+                <div id="attendanceStatus" class="status"></div>
+                <div style="margin-top:10px;">
+                    <button id="refreshAttendanceBtn" class="secondary" type="button">Refresh history</button>
+                </div>
+                <table id="attendanceTable">
+                    <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Check in</th>
+                        <th>Check out</th>
+                    </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <div class="card">
+                <h3 style="margin-top:0;font-size:1rem;">Leave requests</h3>
+                <form id="leaveForm">
+                    <label for="leaveStart">Start date</label>
+                    <input id="leaveStart" type="date" required>
+
+                    <label for="leaveEnd" style="margin-top:8px;">End date</label>
+                    <input id="leaveEnd" type="date" required>
+
+                    <label for="leaveReason" style="margin-top:8px;">Reason</label>
+                    <textarea id="leaveReason" rows="2" required></textarea>
+
+                    <div style="margin-top: 10px;">
+                        <button type="submit">Submit leave request</button>
+                    </div>
+                </form>
+                <div id="leaveStatus" class="status"></div>
+                <div style="margin-top:10px;">
+                    <button id="refreshLeavesBtn" class="secondary" type="button">Refresh my requests</button>
+                </div>
+                <table id="leaveTable">
+                    <thead>
+                    <tr>
+                        <th>Period</th>
+                        <th>Reason</th>
+                        <th>Status</th>
+                    </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <div class="card">
+                <h3 style="margin-top:0;font-size:1rem;">Overtime</h3>
+                <form id="otForm">
+                    <label for="otDate">Date</label>
+                    <input id="otDate" type="date" required>
+
+                    <label for="otHours" style="margin-top:8px;">Hours</label>
+                    <input id="otHours" type="number" min="1" required>
+
+                    <label for="otDesc" style="margin-top:8px;">Description</label>
+                    <textarea id="otDesc" rows="2"></textarea>
+
+                    <div style="margin-top:10px;">
+                        <button type="submit">Log overtime</button>
+                    </div>
+                </form>
+                <div id="otStatus" class="status"></div>
+                <div style="margin-top:10px;">
+                    <button id="refreshOtBtn" class="secondary" type="button">Refresh overtime</button>
+                </div>
+                <table id="otTable">
+                    <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Hours</th>
+                        <th>Description</th>
+                    </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const authSection = document.getElementById('authSection');
+    const appSection = document.getElementById('appSection');
+    const currentUserSpan = document.getElementById('currentUser');
+    const logoutBtn = document.getElementById('logoutBtn');
+
+    function setStatus(el, msg, ok = true) {
+        el.textContent = msg || '';
+        el.classList.remove('ok', 'error');
+        if (!msg) return;
+        el.classList.add(ok ? 'ok' : 'error');
+    }
+
+    async function apiFetch(url, options = {}) {
+        const res = await fetch(url, {
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
+                ...(options.headers || {})
+            },
+            ...options
+        });
+        if (!res.ok) {
+            const text = await res.text();
+            throw new Error(text || res.statusText || 'Request failed');
+        }
+        if (res.status === 204) {
+            return null;
+        }
+        const ct = res.headers.get('Content-Type') || '';
+        if (ct.includes('application/json')) {
+            return res.json();
+        }
+        return res.text();
+    }
+
+    function onLoggedIn(username) {
+        authSection.classList.add('hidden');
+        appSection.classList.remove('hidden');
+        currentUserSpan.textContent = username;
+        currentUserSpan.classList.remove('hidden');
+        logoutBtn.classList.remove('hidden');
+        refreshAttendance();
+        refreshLeaves();
+        refreshOvertime();
+    }
+
+    function onLoggedOut() {
+        authSection.classList.remove('hidden');
+        appSection.classList.add('hidden');
+        currentUserSpan.classList.add('hidden');
+        logoutBtn.classList.add('hidden');
+    }
+
+    // Login form
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const status = document.getElementById('loginStatus');
+        setStatus(status, '');
+        const form = e.target;
+        const username = form.username.value;
+        const data = new URLSearchParams();
+        data.append('username', form.username.value);
+        data.append('password', form.password.value);
+
+        try {
+            const res = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                body: data,
+                credentials: 'include'
+            });
+            if (!res.ok) {
+                throw new Error('Invalid credentials');
+            }
+            setStatus(status, 'Logged in successfully.', true);
+            onLoggedIn(username);
+        } catch (err) {
+            setStatus(status, err.message || 'Login failed', false);
+        }
+    });
+
+    // Registration
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const status = document.getElementById('registerStatus');
+        setStatus(status, '');
+        const fullName = document.getElementById('regFullName').value;
+        const username = document.getElementById('regUsername').value;
+        const password = document.getElementById('regPassword').value;
+
+        try {
+            await apiFetch('/api/auth/register', {
+                method: 'POST',
+                body: JSON.stringify({fullName, username, password})
+            });
+            setStatus(status, 'Registered successfully. Logging in...', true);
+
+            const data = new URLSearchParams();
+            data.append('username', username);
+            data.append('password', password);
+            const res = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                body: data,
+                credentials: 'include'
+            });
+            if (!res.ok) {
+                throw new Error('Registered but automatic login failed');
+            }
+            onLoggedIn(username);
+        } catch (err) {
+            setStatus(status, err.message || 'Registration failed', false);
+        }
+    });
+
+    // Logout
+    logoutBtn.addEventListener('click', async () => {
+        try {
+            await apiFetch('/api/auth/logout', {method: 'POST'});
+        } catch (e) {
+            // ignore
+        }
+        onLoggedOut();
+    });
+
+    // Attendance
+    async function refreshAttendance() {
+        const status = document.getElementById('attendanceStatus');
+        const tbody = document.querySelector('#attendanceTable tbody');
+        setStatus(status, '');
+        tbody.innerHTML = '';
+        try {
+            const items = await apiFetch('/api/attendance');
+            items.forEach(r => {
+                const tr = document.createElement('tr');
+                const fmt = (v) => v ? v.replace('T', ' ').substring(0, 16) : '';
+                tr.innerHTML =
+                    '<td>' + (r.date || '') + '</td>' +
+                    '<td>' + fmt(r.checkInTime) + '</td>' +
+                    '<td>' + fmt(r.checkOutTime) + '</td>';
+                tbody.appendChild(tr);
+            });
+        } catch (e) {
+            setStatus(status, 'Failed to load attendance: ' + e.message, false);
+        }
+    }
+
+    document.getElementById('checkInBtn').addEventListener('click', async () => {
+        const status = document.getElementById('attendanceStatus');
+        setStatus(status, '');
+        try {
+            await apiFetch('/api/attendance/check-in', {method: 'POST'});
+            setStatus(status, 'Checked in.', true);
+            await refreshAttendance();
+        } catch (e) {
+            setStatus(status, e.message || 'Check-in failed', false);
+        }
+    });
+
+    document.getElementById('checkOutBtn').addEventListener('click', async () => {
+        const status = document.getElementById('attendanceStatus');
+        setStatus(status, '');
+        try {
+            await apiFetch('/api/attendance/check-out', {method: 'POST'});
+            setStatus(status, 'Checked out.', true);
+            await refreshAttendance();
+        } catch (e) {
+            setStatus(status, e.message || 'Check-out failed', false);
+        }
+    });
+
+    document.getElementById('refreshAttendanceBtn').addEventListener('click', refreshAttendance);
+
+    // Leave
+    async function refreshLeaves() {
+        const status = document.getElementById('leaveStatus');
+        const tbody = document.querySelector('#leaveTable tbody');
+        setStatus(status, '');
+        tbody.innerHTML = '';
+        try {
+            const items = await apiFetch('/api/leaves/me');
+            items.forEach(r => {
+                const tr = document.createElement('tr');
+                tr.innerHTML =
+                    '<td>' + (r.startDate || '') + ' → ' + (r.endDate || '') + '</td>' +
+                    '<td>' + (r.reason || '') + '</td>' +
+                    '<td>' + (r.status || '') + '</td>';
+                tbody.appendChild(tr);
+            });
+        } catch (e) {
+            setStatus(status, 'Failed to load leave requests: ' + e.message, false);
+        }
+    }
+
+    document.getElementById('leaveForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const status = document.getElementById('leaveStatus');
+        setStatus(status, '');
+        const startDate = document.getElementById('leaveStart').value;
+        const endDate = document.getElementById('leaveEnd').value;
+        const reason = document.getElementById('leaveReason').value;
+
+        try {
+            await apiFetch('/api/leaves', {
+                method: 'POST',
+                body: JSON.stringify({startDate, endDate, reason})
+            });
+            setStatus(status, 'Leave request submitted.', true);
+            e.target.reset();
+            await refreshLeaves();
+        } catch (e2) {
+            setStatus(status, e2.message || 'Failed to submit leave', false);
+        }
+    });
+
+    document.getElementById('refreshLeavesBtn').addEventListener('click', refreshLeaves);
+
+    // Overtime
+    async function refreshOvertime() {
+        const status = document.getElementById('otStatus');
+        const tbody = document.querySelector('#otTable tbody');
+        setStatus(status, '');
+        tbody.innerHTML = '';
+        try {
+            const items = await apiFetch('/api/overtime');
+            items.forEach(r => {
+                const tr = document.createElement('tr');
+                tr.innerHTML =
+                    '<td>' + (r.date || '') + '</td>' +
+                    '<td>' + (r.hours || '') + '</td>' +
+                    '<td>' + (r.description || '') + '</td>';
+                tbody.appendChild(tr);
+            });
+        } catch (e) {
+            setStatus(status, 'Failed to load overtime: ' + e.message, false);
+        }
+    }
+
+    document.getElementById('otForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const status = document.getElementById('otStatus');
+        setStatus(status, '');
+        const date = document.getElementById('otDate').value;
+        const hours = parseInt(document.getElementById('otHours').value, 10);
+        const description = document.getElementById('otDesc').value;
+
+        try {
+            await apiFetch('/api/overtime', {
+                method: 'POST',
+                body: JSON.stringify({date, hours, description})
+            });
+            setStatus(status, 'Overtime logged.', true);
+            e.target.reset();
+            await refreshOvertime();
+        } catch (e2) {
+            setStatus(status, e2.message || 'Failed to log overtime', false);
+        }
+    });
+
+    document.getElementById('refreshOtBtn').addEventListener('click', refreshOvertime);
+</script>
+</body>
+</html>
+
