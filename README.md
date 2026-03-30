@@ -49,13 +49,20 @@ Configuration Management: Spring Profiles (Allowing seamless switching between S
    ```bash
    mvn spring-boot:run
    ```
+### SQL Server
 
-3. H2 console (optional):
+1. Make sure a SQL Server instance is running and reachable.
+2. In `src/main/resources/application-sqlserver.properties` set:
+   - `spring.datasource.url`
+   - `spring.datasource.username`
+   - `spring.datasource.password`
+3. Start the app with the `sqlserver` profile:
 
-   - URL: `http://localhost:8080/h2-console`
-   - JDBC URL: `jdbc:h2:mem:timetrackingdb`
-   - User: `sa`
-   - Password: (leave empty)
+   ```bash
+   mvn spring-boot:run -Dspring-boot.run.profiles=sqlserver
+   ```
+   
+
 
 ## Basic API overview
 
@@ -89,18 +96,12 @@ You can use Spring profiles to target Oracle or SQL Server.
    mvn spring-boot:run -Dspring-boot.run.profiles=oracle
    ```
 
-### SQL Server
+### H2 console (optional):
 
-1. Make sure a SQL Server instance is running and reachable.
-2. In `src/main/resources/application-sqlserver.properties` set:
-   - `spring.datasource.url`
-   - `spring.datasource.username`
-   - `spring.datasource.password`
-3. Start the app with the `sqlserver` profile:
+   - URL: `http://localhost:8080/h2-console`
+   - JDBC URL: `jdbc:h2:mem:timetrackingdb`
+   - User: `sa`
+   - Password: (leave empty)
 
-   ```bash
-   mvn spring-boot:run -Dspring-boot.run.profiles=sqlserver
-   ```
-
-The Oracle (`ojdbc11`) and SQL Server (`mssql-jdbc`) drivers are already declared in `pom.xml` with runtime scope.
+The Oracle (`ojdbc11`) and H2 drivers are already declared in `pom.xml` with runtime scope.
 
