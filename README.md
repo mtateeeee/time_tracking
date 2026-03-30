@@ -79,7 +79,7 @@ Configuration Management: Spring Profiles (Allowing seamless switching between S
 - `POST /api/overtime` – log overtime for current user
 - `GET /api/overtime` – list overtime records for current user
 
-## Switching to Oracle / SQL Server
+## Switching to Oracle / H2
 
 You can use Spring profiles to target Oracle or SQL Server.
 
