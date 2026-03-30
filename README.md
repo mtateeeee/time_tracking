@@ -2,6 +2,20 @@
 
 Simple Spring Boot application for tracking employee check-in/check-out, leave requests, and overtime.
 
+## User Interface Previews
+
+### 1. Authentication Screen
+![Home Page](img/homepage.jpg)
+
+### 2. Homepage
+![Movie Detail](img/userpage.jpg)
+
+### 3. Request Pending
+![Movie Watch](img/request.jpg)
+
+### 4. Admin Screen
+![Loading Movie](img/adminpage.jpg)
+
 ## Tech stack
 
 - Spring Boot (Web, Security, Data JPA, Validation)
