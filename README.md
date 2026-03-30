@@ -18,8 +18,25 @@ Simple Spring Boot application for tracking employee check-in/check-out, leave r
 
 ## Tech stack
 
-- Spring Boot (Web, Security, Data JPA, Validation)
-- H2 in-memory DB for local dev (easily switchable to Oracle / SQL Server)
+## Backend Core
+Java 17: Leveraging modern features and long-term support.
+
+Spring Boot 3.2.0: Utilizing the latest framework for high-performance microservices and web applications.
+
+Spring Security: Implementing robust authentication and authorization.
+
+Spring Data JPA (Hibernate): Streamlining database operations with Object-Relational Mapping (ORM).
+
+Bean Validation: Ensuring data integrity using JSR 380 (Hibernate Validator).
+
+## Database & Persistence
+Primary Database: Microsoft SQL Server (Production-ready with optimized T-SQL dialects).
+
+Secondary/Dev Database: Oracle Database (Fully configured and switchable via profiles).
+
+Local Development: H2 In-memory DB (Used for rapid prototyping and unit testing).
+
+Configuration Management: Spring Profiles (Allowing seamless switching between SQL Server, Oracle, and H2 without code changes).
 
 ## How to run
 
