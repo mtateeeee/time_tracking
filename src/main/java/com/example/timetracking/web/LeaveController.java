@@ -40,6 +40,12 @@ public class LeaveController {
         return ResponseEntity.ok(leaveService.getForEmployee(employee));
     }
 
+    @GetMapping("/pending")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
+    public ResponseEntity<List<LeaveRequest>> pending() {
+        return ResponseEntity.ok(leaveService.getPending());
+    }
+
     @PostMapping("/{id}/approve")
     @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
     public ResponseEntity<LeaveRequest> approve(@PathVariable Long id) {

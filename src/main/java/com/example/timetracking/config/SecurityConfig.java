@@ -5,6 +5,7 @@ import com.example.timetracking.repository.EmployeeRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.GrantedAuthority;
@@ -95,6 +96,8 @@ public class SecurityConfig {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
         provider.setPasswordEncoder(passwordEncoder);
         provider.setUserDetailsService(userDetailsService);
+        // Allow distinguishing "user not found" vs "bad password" for UI messaging
+        provider.setHideUserNotFoundExceptions(false);
         return provider;
     }
 
@@ -111,11 +114,35 @@ public class SecurityConfig {
                                 "/images/**",
                                 "/actuator/health"
                         ).permitAll()
-                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers(
+                                "/api/auth/login",
+                                "/api/auth/register",
+                                "/api/auth/logout"
+                        ).permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
                         .loginProcessingUrl("/api/auth/login")
+                        .successHandler((request, response, authentication) -> response.setStatus(200))
+                        .failureHandler((request, response, exception) -> {
+                            Throwable ex = exception;
+                            if (ex.getCause() != null) {
+                                ex = ex.getCause();
+                            }
+
+                            final String code;
+                            if (ex instanceof UsernameNotFoundException) {
+                                code = "WRONG_USERNAME";
+                            } else if (ex instanceof BadCredentialsException) {
+                                code = "WRONG_PASSWORD";
+                            } else {
+                                code = "INVALID_CREDENTIALS";
+                            }
+
+                            response.setStatus(401);
+                            response.setContentType("application/json");
+                            response.getWriter().write("{\"error\":\"" + code + "\"}");
+                        })
                         .permitAll()
                 )
                 .logout(logout -> logout

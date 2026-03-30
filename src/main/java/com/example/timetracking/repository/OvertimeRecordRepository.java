@@ -9,5 +9,9 @@ import java.util.List;
 public interface OvertimeRecordRepository extends JpaRepository<OvertimeRecord, Long> {
 
     List<OvertimeRecord> findByEmployee(Employee employee);
+
+    List<OvertimeRecord> findByStatus(OvertimeRecord.Status status);
+
+    List<OvertimeRecord> findByStatusOrStatusIsNull(OvertimeRecord.Status status);
 }
 

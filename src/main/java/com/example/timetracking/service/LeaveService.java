@@ -25,6 +25,11 @@ public class LeaveService {
         return leaveRequestRepository.findByEmployee(employee);
     }
 
+    public List<LeaveRequest> getPending() {
+        // Safety for older rows with NULL status
+        return leaveRequestRepository.findByStatusOrStatusIsNull(LeaveRequest.Status.PENDING);
+    }
+
     public LeaveRequest approve(Long id) {
         LeaveRequest request = leaveRequestRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Leave request not found"));
