@@ -30,9 +30,9 @@ Spring Data JPA (Hibernate): Streamlining database operations with Object-Relati
 Bean Validation: Ensuring data integrity using JSR 380 (Hibernate Validator).
 
 ## Database & Persistence
-Primary Database: Microsoft SQL Server (Production-ready with optimized T-SQL dialects).
+Primary Database: Microsoft SQL Server.
 
-Secondary/Dev Database: Oracle Database (Fully configured and switchable via profiles).
+Secondary/Dev Database: Oracle Database.
 
 Local Development: H2 In-memory DB (Used for rapid prototyping and unit testing).
 
